@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyPosture - Study Session</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            overflow: hidden;
+        }
+
+        /* Hidden webcam elements */
+        #webcam {
+            display: none;
+        }
+
+        #poseCanvas {
+            display: none;
+        }
+
+        /* Setup screen (before study starts) */
+        #setupScreen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .setup-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .setup-container h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .timer-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .hint {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Study screen (fullscreen mode) */
+        #studyScreen {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        #studyContent {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Posture alert overlay */
+        #postureOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 107, 107, 0.15);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            animation: overlayPulse 2s infinite;
+        }
+
+        @keyframes overlayPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .alert-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            animation: alertBounce 0.5s;
+        }
+
+        @keyframes alertBounce {
+            0% { transform: translate(-50%, -50%) scale(0.8); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .alert-message h2 {
+            color: #ff6b6b;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .alert-message p {
+            color: #666;
+            font-size: 18px;
+        }
+
+        /* Pomodoro timer (top-right corner) */
+        #pomodoroTimer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 9998;
+            display: none;
+        }
+
+        .timer-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-label {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        /* Status indicator (bottom-right) */
+        #statusIndicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px 20px;
+            border-radius: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 9998;
+            display: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-good {
+            color: #4CAF50;
+        }
+
+        .status-bad {
+            color: #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hidden webcam for posture detection -->
+    <video id="webcam" autoplay playsinline></video>
+    <canvas id="poseCanvas"></canvas>
+
+    <!-- Setup Screen -->
+    <div id="setupScreen">
+        <!-- ========================================== -->
+        <!-- YOUR FRIEND'S SETUP UI GOES HERE!          -->
+        <!-- This is placeholder - replace with Figma   -->
+        <!-- ========================================== -->
+        <div class="setup-container">
+            <h1>🧘 Start Your Study Session</h1>
+            
+            <div class="input-group">
+                <label>📚 Study Material Link</label>
+                <input type="url" id="studyLink" placeholder="Paste YouTube, Google Drive, or any link">
+                <p class="hint">
+                    <strong>YouTube:</strong> Just paste the regular link<br>
+                    <strong>Google Drive/Docs:</strong> Right-click → Share → "Anyone with the link" → Copy link<br>
+                    <em style="color: #ff6b6b;">⚠️ Private Google files won't work! Must be shared publicly.</em>
+                </p>
+            </div>
+
+            <div class="input-group">
+                <label>📂 Content Type</label>
+                <select id="contentType">
+                    <option value="auto">Auto-detect</option>
+                    <option value="youtube">YouTube Video</option>
+                    <option value="drive">Google Drive</option>
+                    <option value="docs">Google Docs</option>
+                    <option value="pdf">PDF</option>
+                    <option value="webpage">Webpage</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>🍅 Pomodoro Timer (Optional)</label>
+                <div class="timer-inputs">
+                    <input type="number" id="workMinutes" placeholder="Work (min)" value="25">
+                    <input type="number" id="breakMinutes" placeholder="Break (min)" value="5">
+                </div>
+            </div>
+
+            <button class="btn" onclick="startStudySession()">Start Learning 🚀</button>
+        </div>
+    </div>
+
+    <!-- Study Screen (Hidden initially) -->
+    <div id="studyScreen">
+        <iframe id="studyContent" allowfullscreen></iframe>
+        
+        <!-- Pomodoro Timer Display -->
+        <div id="pomodoroTimer">
+            <div class="timer-display" id="timerDisplay">25:00</div>
+            <div class="timer-label" id="timerLabel">Work Time</div>
+        </div>
+
+        <!-- Posture Status -->
+        <div id="statusIndicator" class="status-good">
+            ✓ Good Posture
+        </div>
+
+        <!-- Posture Alert Overlay (Hidden until slouching detected) -->
+        <!-- ========================================== -->
+        <!-- YOUR FRIEND'S ALERT UI GOES HERE!          -->
+        <!-- Current: blur overlay with message         -->
+        <!-- Can replace with her design                -->
+        <!-- ========================================== -->
+        <div id="postureOverlay">
+            <div class="alert-message">
+                <h2>⚠️ Improve Your Posture</h2>
+                <p id="slouchReason">You're slouching!</p>
+                <p style="margin-top: 10px; font-size: 14px; color: #999;">Sit up straight to continue</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MediaPipe Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
+    <!-- Our Modules -->
+    <script src="js/pose-detection.js"></script>
+    <script src="js/calibration.js"></script>
+    <script src="js/calibrated-posture-monitor.js"></script>
+
+    <!-- Main Study Session Script -->
+    <script>
+        // Initialize modules
+        const poseDetector = new PoseDetector();
+        const calibrator = new PostureCalibrator();
+        const monitor = new CalibratedPostureMonitor(calibrator);
+
+        // Pomodoro state
+        let pomodoroInterval = null;
+        let timeRemaining = 0;
+        let isWorkTime = true;
+
+        /**
+         * Convert link to embeddable format
+         */
+        function convertToEmbedUrl(url, type) {
+            // YouTube
+            if (url.includes('youtube.com') || url.includes('youtu.be') || type === 'youtube') {
+                const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\?\/]+)/);
+                if (videoId) {
+                    return `https://www.youtube.com/embed/${videoId[1]}?autoplay=1`;
+                }
+            }
+
+            // Google Drive
+            if (url.includes('drive.google.com') || type === 'drive') {
+                const fileId = url.match(/\/d\/([^\/]+)/);
+                if (fileId) {
+                    return `https://drive.google.com/file/d/${fileId[1]}/preview`;
+                }
+            }
+
+            // Google Docs
+            if (url.includes('docs.google.com') || type === 'docs') {
+                // Extract doc ID and convert to embed
+                const docId = url.match(/\/d\/([^\/]+)/);
+                if (docId) {
+                    return `https://docs.google.com/document/d/${docId[1]}/preview`;
+                }
+            }
+
+            // PDF or regular webpage
+            return url;
+        }
+
+        /**
+         * Start study session
+         */
+        async function startStudySession() {
+            const studyLink = document.getElementById('studyLink').value;
+            const contentType = document.getElementById('contentType').value;
+            const workMinutes = parseInt(document.getElementById('workMinutes').value) || 25;
+            const breakMinutes = parseInt(document.getElementById('breakMinutes').value) || 5;
+
+            if (!studyLink) {
+                alert('Please enter a study material link!');
+                return;
+            }
+
+            // Convert link to embeddable format
+            const embedUrl = convertToEmbedUrl(studyLink, contentType);
+
+            // Load content
+            document.getElementById('studyContent').src = embedUrl;
+
+            // Switch to study screen
+            document.getElementById('setupScreen').style.display = 'none';
+            document.getElementById('studyScreen').style.display = 'block';
+            document.getElementById('pomodoroTimer').style.display = 'block';
+            document.getElementById('statusIndicator').style.display = 'block';
+
+            // Start webcam in background
+            await initializePostureDetection();
+
+            // Start Pomodoro timer
+            startPomodoro(workMinutes, breakMinutes);
+
+            // Try to go fullscreen
+            try {
+                document.getElementById('studyScreen').requestFullscreen();
+            } catch (e) {
+                console.log('Fullscreen not supported or denied');
+            }
+        }
+
+        /**
+         * Initialize posture detection (background)
+         */
+        async function initializePostureDetection() {
+            // Load calibration
+            const hasCalibration = calibrator.loadCalibration();
+            
+            if (!hasCalibration) {
+                alert('⚠️ No calibration found! Please calibrate first.');
+                window.location.href = 'calibration-page.html';
+                return;
+            }
+
+            // Initialize pose detector
+            await poseDetector.initialize('webcam', 'poseCanvas');
+            await poseDetector.start(onPoseResults);
+
+            // Set up monitor callbacks
+            monitor.onSlouch((data) => {
+                // Show blur overlay
+                document.getElementById('postureOverlay').style.display = 'block';
+                document.getElementById('slouchReason').textContent = data.reason;
+                document.getElementById('statusIndicator').className = 'status-bad';
+                document.getElementById('statusIndicator').textContent = '⚠ Poor Posture';
+                
+                console.log('🚨 SLOUCH DETECTED:', data);
+            });
+
+            monitor.onCorrection(() => {
+                // Hide blur overlay
+                document.getElementById('postureOverlay').style.display = 'none';
+                document.getElementById('statusIndicator').className = 'status-good';
+                document.getElementById('statusIndicator').textContent = '✓ Good Posture';
+                
+                console.log('✅ Posture corrected!');
+            });
+
+            // Start monitoring
+            monitor.start();
+        }
+
+        /**
+         * Handle pose detection results
+         */
+        function onPoseResults(results) {
+            const landmarks = PoseDetector.extractLandmarks(results);
+            
+            if (landmarks) {
+                const metrics = PoseDetector.calculatePostureMetrics(landmarks);
+                
+                if (metrics) {
+                    monitor.processFrame(metrics);
+                }
+            }
+        }
+
+        /**
+         * Start Pomodoro timer
+         */
+        function startPomodoro(workMinutes, breakMinutes) {
+            timeRemaining = workMinutes * 60;
+            isWorkTime = true;
+            
+            updateTimerDisplay();
+            
+            pomodoroInterval = setInterval(() => {
+                timeRemaining--;
+                
+                if (timeRemaining <= 0) {
+                    // Switch between work and break
+                    if (isWorkTime) {
+                        alert('🎉 Work session complete! Time for a break!');
+                        timeRemaining = breakMinutes * 60;
+                        isWorkTime = false;
+                        document.getElementById('timerLabel').textContent = 'Break Time';
+                    } else {
+                        alert('✨ Break over! Back to work!');
+                        timeRemaining = workMinutes * 60;
+                        isWorkTime = true;
+                        document.getElementById('timerLabel').textContent = 'Work Time';
+                    }
+                }
+                
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        /**
+         * Update timer display
+         */
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Handle escape from fullscreen
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                // User exited fullscreen - could pause monitoring or show warning
+                console.log('Exited fullscreen');
+            }
+        });
+    </script>
+</body>
+</html>

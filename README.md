@@ -6,20 +6,20 @@
 
 ## Basic Details
 
-### Team Name: [Name]
+### Team Name: [SKZ:Code]
 
 ### Team Members
-- Member 1: [Name] - [College]
-- Member 2: [Name] - [College]
+- Member 1: [Abida MS] - [Government Engineering College Thrissur]
+- Member 2: [Hadiya Thanveer] - [Government Engineering College Thrissur]
 
 ### Hosted Project Link
 [mention your project hosted link here]
 
 ### Project Description
-[2-3 lines about what your project does]
+[its a study space website that uses your webcam and an existing AI model to track your posture real time while studying, and helps u fix it by sending alerts and reminding u to stretch!]
 
 ### The Problem statement
-[What problem are you solving?]
+[We're solving bad posture problems that arise when studying for a prolonged period of time.]
 
 ### The Solution
 [How are you solving it?]

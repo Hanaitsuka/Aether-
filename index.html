@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Posture Detection Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .panel h2 {
+      margin-bottom: 20px;
+      color: #667eea;
+      font-size: 1.5em;
+    }
+
+    .video-container {
+      position: relative;
+      background: #000;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+
+    #videoElement {
+      width: 100%;
+      display: block;
+    }
+
+    #canvasElement {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+      animation: pulse 2s infinite;
+    }
+
+    .status-indicator.good {
+      background: #4CAF50;
+    }
+
+    .status-indicator.bad {
+      background: #f44336;
+    }
+
+    .status-indicator.warning {
+      background: #ff9800;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin: 5px;
+      font-weight: 600;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+    }
+
+    .btn-success {
+      background: #28a745;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .metric-item {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 8px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-label {
+      font-weight: 600;
+      color: #495057;
+    }
+
+    .metric-value {
+      font-family: 'Courier New', monospace;
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 30px;
+      background: #e9ecef;
+      border-radius: 15px;
+      overflow: hidden;
+      margin: 15px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      transition: width 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+
+    .alert {
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin: 15px 0;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .alert-warning {
+      background: #fff3cd;
+      border-left: 4px solid #ff9800;
+      color: #856404;
+    }
+
+    .alert-danger {
+      background: #f8d7da;
+      border-left: 4px solid #f44336;
+      color: #721c24;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      border-left: 4px solid #4CAF50;
+      color: #155724;
+    }
+
+    .alert-info {
+      background: #d1ecf1;
+      border-left: 4px solid #17a2b8;
+      color: #0c5460;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2em;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .stat-label {
+      font-size: 0.9em;
+      opacity: 0.9;
+    }
+
+    .calibration-steps {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+
+    .calibration-steps ol {
+      margin-left: 20px;
+      margin-top: 10px;
+    }
+
+    .calibration-steps li {
+      margin: 8px 0;
+      line-height: 1.6;
+    }
+
+    #statusMessage {
+      font-size: 1.2em;
+      text-align: center;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    .strategy-selector {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+
+    .strategy-selector label {
+      display: block;
+      margin: 10px 0;
+      cursor: pointer;
+    }
+
+    .strategy-selector input[type="radio"] {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧘 Posture Detection System Demo</h1>
+    
+    <div class="grid">
+      <!-- Left Panel: Camera & Controls -->
+      <div class="panel">
+        <h2>📹 Camera Feed</h2>
+        
+        <div class="video-container">
+          <video id="videoElement" autoplay playsinline></video>
+          <canvas id="canvasElement"></canvas>
+        </div>
+
+        <div class="controls">
+          <button class="btn" id="startCameraBtn">Start Camera</button>
+          <button class="btn btn-secondary" id="stopCameraBtn" disabled>Stop Camera</button>
+        </div>
+
+        <div id="statusMessage"></div>
+
+        <!-- Strategy Selector -->
+        <div class="strategy-selector">
+          <strong>Detection Strategy:</strong>
+          <label>
+            <input type="radio" name="strategy" value="both" checked>
+            Both (Recommended) - Ratio + Drift Detection
+          </label>
+          <label>
+            <input type="radio" name="strategy" value="ratio">
+            Ratio-Based Only - Compare to calibration
+          </label>
+          <label>
+            <input type="radio" name="strategy" value="drift">
+            Drift-Based Only - Track session changes
+          </label>
+        </div>
+      </div>
+
+      <!-- Right Panel: Calibration & Monitoring -->
+      <div class="panel">
+        <h2>⚙️ Calibration & Monitoring</h2>
+
+        <!-- Calibration Section -->
+        <div id="calibrationSection">
+          <div class="calibration-steps">
+            <strong>📋 Calibration Steps:</strong>
+            <ol>
+              <li>Sit with <strong>good posture</strong> - back straight, shoulders relaxed</li>
+              <li>Click "Calibrate Good Posture" and hold still for 2 seconds</li>
+              <li>Then slouch deliberately (hunch forward)</li>
+              <li>Click "Calibrate Slouched Posture" and hold still for 2 seconds</li>
+              <li>Start monitoring!</li>
+            </ol>
+          </div>
+
+          <div class="progress-bar" id="calibrationProgress" style="display: none;">
+            <div class="progress-fill" id="calibrationProgressFill">0%</div>
+          </div>
+
+          <div class="controls">
+            <button class="btn btn-success" id="calibrateGoodBtn">Calibrate Good Posture</button>
+            <button class="btn btn-warning" id="calibrateSlouchBtn" disabled>Calibrate Slouched Posture</button>
+            <button class="btn btn-danger" id="clearCalibrationBtn">Clear Calibration</button>
+          </div>
+
+          <div id="calibrationAlert" class="alert"></div>
+        </div>
+
+        <!-- Monitoring Section -->
+        <div id="monitoringSection" style="margin-top: 25px;">
+          <h3 style="margin-bottom: 15px;">🎯 Real-Time Monitoring</h3>
+          
+          <div class="controls">
+            <button class="btn btn-success" id="startMonitoringBtn" disabled>Start Monitoring</button>
+            <button class="btn btn-secondary" id="stopMonitoringBtn" disabled>Stop Monitoring</button>
+            <button class="btn" id="resetSessionBtn" disabled>Reset Session</button>
+          </div>
+
+          <div id="postureAlert" class="alert"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Panel: Metrics & Stats -->
+    <div class="panel">
+      <h2>📊 Live Metrics & Statistics</h2>
+      
+      <div class="grid">
+        <div>
+          <h3 style="margin-bottom: 15px;">Current Posture Metrics</h3>
+          <div id="currentMetrics">
+            <div class="metric-item">
+              <span class="metric-label">Status:</span>
+              <span class="metric-value" id="postureStatus">--</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">Head-Shoulder Ratio:</span>
+              <span class="metric-value" id="headShoulderRatio">--</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">Shoulder Asymmetry:</span>
+              <span class="metric-value" id="shoulderAsymmetry">--</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">Torso Angle:</span>
+              <span class="metric-value" id="torsoAngle">--</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">Neck Angle:</span>
+              <span class="metric-value" id="neckAngle">--</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="margin-bottom: 15px;">Session Statistics</h3>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Posture Quality</div>
+              <div class="stat-number" id="postureQuality">0%</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Total Alerts</div>
+              <div class="stat-number" id="totalAlerts">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Good Frames</div>
+              <div class="stat-number" id="goodFrames">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Slouch Frames</div>
+              <div class="stat-number" id="slouchFrames">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MediaPipe Dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
+  <!-- Our Modules -->
+  <script src="js/pose-detection.js"></script>
+  <script src="js/calibration.js"></script>
+  <script src="js/posture-monitor.js"></script>
+
+  <!-- Main App Script -->
+  <script src="js/demo-app.js"></script>
+</body>
+</html>

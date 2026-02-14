@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyPosture - Calibration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .video-preview {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            background: #000;
+            display: none;
+        }
+
+        #webcam {
+            width: 100%;
+            display: block;
+        }
+
+        .instruction-box {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .instruction-box h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .instruction-box ol {
+            margin-left: 20px;
+        }
+
+        .instruction-box li {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .progress-section {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 40px;
+            background: #e9ecef;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .status-message {
+            font-size: 18px;
+            color: #667eea;
+            font-weight: 600;
+            margin: 15px 0;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 10px 0;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .emoji {
+            font-size: 60px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .success-box {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .success-box h2 {
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hidden elements for pose detection -->
+    <canvas id="poseCanvas"></canvas>
+
+    <div class="container">
+        <!-- ========================================== -->
+        <!-- YOUR FRIEND'S CALIBRATION UI GOES HERE!    -->
+        <!-- This is placeholder - replace with Figma   -->
+        <!-- ========================================== -->
+
+        <h1>🧘 Posture Calibration</h1>
+        <p class="subtitle">One-time setup to learn your body's posture</p>
+
+        <!-- Video Preview -->
+        <div class="video-preview" id="videoPreview">
+            <video id="webcam" autoplay playsinline></video>
+        </div>
+
+        <!-- Step 1: Instructions -->
+        <div id="instructionsStep">
+            <div class="instruction-box">
+                <h2>📋 What is calibration?</h2>
+                <p style="margin-bottom: 15px;">
+                    We need to learn what YOUR good posture looks like! Everyone's body is different, so we'll capture:
+                </p>
+                <ol>
+                    <li><strong>Your good posture</strong> - Sit comfortably with back straight</li>
+                    <li><strong>Your slouched posture</strong> - Deliberately hunch forward (so we know what to avoid!)</li>
+                </ol>
+                <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                    ⏱️ Takes only 10 seconds total!
+                </p>
+            </div>
+
+            <button class="btn" id="startCameraBtn">Start Calibration 🚀</button>
+            <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'">Skip (Not Recommended)</button>
+        </div>
+
+        <!-- Step 2: Good Posture Calibration -->
+        <div id="goodPostureStep" style="display: none;">
+            <div class="emoji">🧍</div>
+            <h2 style="text-align: center; color: #667eea; margin-bottom: 15px;">
+                Step 1: Good Posture
+            </h2>
+            
+            <div class="instruction-box">
+                <p><strong>Sit with good posture:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Back straight</li>
+                    <li>Shoulders relaxed</li>
+                    <li>Head over shoulders (not forward)</li>
+                    <li>Feet flat on floor</li>
+                </ul>
+            </div>
+
+            <div class="progress-section" id="goodProgress">
+                <div class="status-message" id="goodStatus">Hold still...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="goodProgressFill">0%</div>
+                </div>
+            </div>
+
+            <button class="btn" id="captureGoodBtn">I'm Ready - Capture Good Posture!</button>
+        </div>
+
+        <!-- Step 3: Slouched Posture Calibration -->
+        <div id="slouchedPostureStep" style="display: none;">
+            <div class="emoji">🍤</div>
+            <h2 style="text-align: center; color: #667eea; margin-bottom: 15px;">
+                Step 2: Slouched Posture
+            </h2>
+            
+            <div class="instruction-box">
+                <p><strong>Now deliberately slouch:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Hunch forward</li>
+                    <li>Push your head forward</li>
+                    <li>Curve your spine</li>
+                    <li>Lean into the screen</li>
+                </ul>
+            </div>
+
+            <div class="progress-section" id="slouchedProgress">
+                <div class="status-message" id="slouchedStatus">Hold still...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="slouchedProgressFill">0%</div>
+                </div>
+            </div>
+
+            <button class="btn" id="captureSlouchedBtn">I'm Ready - Capture Slouched Posture!</button>
+        </div>
+
+        <!-- Step 4: Success -->
+        <div class="success-box" id="successStep">
+            <div class="emoji">🎉</div>
+            <h2>Calibration Complete!</h2>
+            <p style="color: #666; margin-bottom: 25px;">
+                Your posture profile has been saved. We'll now monitor your posture during study sessions!
+            </p>
+            <button class="btn" onclick="window.location.href='dashboard.html'">Continue to Dashboard →</button>
+        </div>
+    </div>
+
+    <!-- MediaPipe Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
+    <!-- Our Modules -->
+    <script src="js/pose-detection.js"></script>
+    <script src="js/calibration.js"></script>
+
+    <!-- Calibration Script -->
+    <script>
+        const poseDetector = new PoseDetector();
+        const calibrator = new PostureCalibrator();
+
+        let currentStep = 'instructions';
+
+        // UI Elements
+        const videoPreview = document.getElementById('videoPreview');
+        const instructionsStep = document.getElementById('instructionsStep');
+        const goodPostureStep = document.getElementById('goodPostureStep');
+        const slouchedPostureStep = document.getElementById('slouchedPostureStep');
+        const successStep = document.getElementById('successStep');
+
+        const startCameraBtn = document.getElementById('startCameraBtn');
+        const captureGoodBtn = document.getElementById('captureGoodBtn');
+        const captureSlouchedBtn = document.getElementById('captureSlouchedBtn');
+
+        const goodProgress = document.getElementById('goodProgress');
+        const goodStatus = document.getElementById('goodStatus');
+        const goodProgressFill = document.getElementById('goodProgressFill');
+
+        const slouchedProgress = document.getElementById('slouchedProgress');
+        const slouchedStatus = document.getElementById('slouchedStatus');
+        const slouchedProgressFill = document.getElementById('slouchedProgressFill');
+
+        // Start camera
+        startCameraBtn.addEventListener('click', async () => {
+            startCameraBtn.disabled = true;
+            startCameraBtn.textContent = 'Starting camera...';
+
+            await poseDetector.initialize('webcam', 'poseCanvas');
+            await poseDetector.start(onPoseResults);
+
+            videoPreview.style.display = 'block';
+            instructionsStep.style.display = 'none';
+            goodPostureStep.style.display = 'block';
+            currentStep = 'good';
+        });
+
+        // Capture good posture
+        captureGoodBtn.addEventListener('click', () => {
+            captureGoodBtn.disabled = true;
+            goodProgress.style.display = 'block';
+            calibrator.startCalibration('good');
+        });
+
+        // Capture slouched posture
+        captureSlouchedBtn.addEventListener('click', () => {
+            captureSlouchedBtn.disabled = true;
+            slouchedProgress.style.display = 'block';
+            calibrator.startCalibration('slouched');
+        });
+
+        // Handle pose results
+        function onPoseResults(results) {
+            const landmarks = PoseDetector.extractLandmarks(results);
+            
+            if (landmarks && calibrator.isCalibrating) {
+                const metrics = PoseDetector.calculatePostureMetrics(landmarks);
+                
+                if (metrics) {
+                    const progress = calibrator.addCalibrationFrame(metrics);
+                    
+                    if (progress) {
+                        if (currentStep === 'good') {
+                            goodProgressFill.style.width = progress.progress + '%';
+                            goodProgressFill.textContent = Math.round(progress.progress) + '%';
+                            
+                            if (progress.progress >= 100) {
+                                setTimeout(() => {
+                                    goodPostureStep.style.display = 'none';
+                                    slouchedPostureStep.style.display = 'block';
+                                    currentStep = 'slouched';
+                                }, 500);
+                            }
+                        } else if (currentStep === 'slouched') {
+                            slouchedProgressFill.style.width = progress.progress + '%';
+                            slouchedProgressFill.textContent = Math.round(progress.progress) + '%';
+                            
+                            if (progress.progress >= 100) {
+                                // Save calibration
+                                calibrator.saveCalibration();
+                                
+                                // Stop camera
+                                poseDetector.stop();
+                                
+                                // Show success
+                                setTimeout(() => {
+                                    slouchedPostureStep.style.display = 'none';
+                                    successStep.style.display = 'block';
+                                    videoPreview.style.display = 'none';
+                                }, 500);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
