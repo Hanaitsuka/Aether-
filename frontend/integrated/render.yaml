@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: aether-frontend
+    env: docker
+    branch: main
+    plan: free
+    region: oregon
+    dockerfilePath: Dockerfile
+    buildCommand: npm install --legacy-peer-deps && npm run build
+    autoDeploy: true
