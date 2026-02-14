@@ -13,7 +13,7 @@
 - Member 2: [Hadiya Thanveer] - [Government Engineering College Thrissur]
 
 ### Hosted Project Link
-[mention your project hosted link here]
+[https://drive.google.com/drive/folders/1_aFv-umEnxPWa2G-AZ3sSdF66MGD0AEN]
 
 ### Project Description
 [Aether is a high-performance productivity dashboard designed to solve the problem of "postural fatigue"—the gradual physical collapse that occurs during intense study sessions. By combining a professional-grade interface with a real-time computer vision engine, Aether automates ergonomic health so the user can remain focused on their output.]
@@ -22,6 +22,7 @@
 [During deep work, self-awareness of posture declines. Sustained slouching leads to "tech neck," reduced oxygen flow, and mental fatigue. Standard solutions are often too intrusive or lack the centralized tools needed for a streamlined study workflow.]
 
 ### The Solution
+
 [Aether integrates health monitoring into a centralized, high-fidelity hub:
 
 Precision Calibration: On the first visit, Aether maps the user’s optimal shoulder and neck coordinates to create a personalized ergonomic baseline.
@@ -33,13 +34,13 @@ Centralized Workspace: To eliminate context switching, Aether embeds a Pomodoro 
 ---
 
 
-Aether was built using an AI-first workflow:
+[Aether was built using an AI-first workflow:
 
 Design: Layouts, micro-animations, and theme variations were conceptualized and prototyped in Figma AI.
 
 Vision: Real-time postural analysis is handled via Mediapipe, running entirely client-side to ensure user privacy—your camera feed never leaves your local machine.
 
-Frontend: The logic, state management (calibration tracking and drift timers), and productivity widgets were implemented in React, providing a lightweight and fast user experience.
+Frontend: The logic, state management (calibration tracking and drift timers), and productivity widgets were implemented in React, providing a lightweight and fast user experience.]
 
 
 
