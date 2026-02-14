@@ -16,64 +16,104 @@
 [mention your project hosted link here]
 
 ### Project Description
-[its a study space website that uses your webcam and an existing AI model to track your posture real time while studying, and helps u fix it by sending alerts and reminding u to stretch!]
+[Aether is a high-performance productivity dashboard designed to solve the problem of "postural fatigue"—the gradual physical collapse that occurs during intense study sessions. By combining a professional-grade interface with a real-time computer vision engine, Aether automates ergonomic health so the user can remain focused on their output.]
 
 ### The Problem statement
-[We're solving bad posture problems that arise when studying for a prolonged period of time.]
+[During deep work, self-awareness of posture declines. Sustained slouching leads to "tech neck," reduced oxygen flow, and mental fatigue. Standard solutions are often too intrusive or lack the centralized tools needed for a streamlined study workflow.]
 
 ### The Solution
-[How are you solving it?]
+[Aether integrates health monitoring into a centralized, high-fidelity hub:
+
+Precision Calibration: On the first visit, Aether maps the user’s optimal shoulder and neck coordinates to create a personalized ergonomic baseline.
+
+Temporal Logic Engine: Using a time-weighted detection loop, the system distinguishes between natural movement and sustained slouching. A "Drift Notification" is triggered only after a multi-second threshold of poor posture is met.
+
+Centralized Workspace: To eliminate context switching, Aether embeds a Pomodoro timer, YouTube player, and document reader into a single interface, available in both 3D Cinematic and 2D Lofi styles.]
 
 ---
 
-## Technical Details
 
-### Technologies/Components Used
+Aether was built using an AI-first workflow:
 
-**For Software:**
-- Languages used: [e.g., JavaScript, Python, Java]
-- Frameworks used: [e.g., React, Django, Spring Boot]
-- Libraries used: [e.g., axios, pandas, JUnit]
-- Tools used: [e.g., VS Code, Git, Docker]
+Design: Layouts, micro-animations, and theme variations were conceptualized and prototyped in Figma AI.
 
-**For Hardware:**
-- Main components: [List main components]
-- Specifications: [Technical specifications]
-- Tools required: [List tools needed]
+Vision: Real-time postural analysis is handled via Mediapipe, running entirely client-side to ensure user privacy—your camera feed never leaves your local machine.
+
+Frontend: The logic, state management (calibration tracking and drift timers), and productivity widgets were implemented in React, providing a lightweight and fast user experience.
+
+
+
+For Software:
+
+Languages used: JavaScript (ES6+), HTML5, CSS3
+
+Frameworks used: React.js, Tailwind CSS
+
+Libraries used: * Mediapipe Pose: For real-time body landmark tracking and vision AI.
+
+
+
+For Hardware:
+
+Main components:
+
+High-Definition Webcam: To capture body landmarks at a minimum of 30 frames per second for accurate pose estimation.
+
+Workstation/Laptop: Host machine for running the React frontend and the Mediapipe Pose engine.
+
+Monitor: Primary display for the Aether dashboard and visual notification system.
+
 
 ---
 
-## Features
+Features
+•	Feature 1: Intelligent Posture Mapping (Calibration)
+Initializes a personalized ergonomic baseline on the first visit by mapping the user's optimal shoulder and neck coordinates. This data is stored locally to ensure the tracking engine is tuned to the user's specific height and seating position.
+•	Feature 2: Temporal Drift Detection
+Utilizes a time-weighted monitoring algorithm that differentiates between natural movement and sustained slouching. Notifications are only triggered if the user remains outside their calibrated threshold for a continuous period (e.g., 5 seconds), preventing false alerts.
+•	Feature 3: AI-Driven Multi-Perspective Dashboard
+A high-fidelity interface architected in Figma AI that allows users to toggle between a 3D Cinematic environment and a 2D Lofi aesthetic. The dashboard remains consistent across themes, ensuring productivity tools are always accessible.
+•	Feature 4: Integrated Focus Ecosystem
+A centralized workspace that embeds a Pomodoro timer, YouTube ambient player, and document reader into a single window. This reduces context switching and cognitive load, allowing users to stay within their flow state.
+•	Feature 5: Real-Time Aetheric Alignment Monitor
+A live skeletal HUD (Heads-Up Display) that provides immediate visual feedback on the user's current posture. This acts as a subtle peripheral guide to help users self-correct before the notification threshold is met.
 
-List the key features of your project:
-- Feature 1: [Description]
-- Feature 2: [Description]
-- Feature 3: [Description]
-- Feature 4: [Description]
 
 ---
 
-## Implementation
+Implementation
 
 ### For Software:
 
 #### Installation
 ```bash
-[Installation commands - e.g., npm install, pip install -r requirements.txt]
+git clone https://github.com/your-team/aether.git
+cd aether
+npm install
 ```
 
 #### Run
 ```bash
-[Run commands - e.g., npm start, python app.py]
+npm start
 ```
 
 ### For Hardware:
 
-#### Components Required
-[List all components needed with specifications]
+Components Required
 
-#### Circuit Setup
-[Explain how to set up the circuit]
+Webcam: Integrated or USB external camera (720p/30fps minimum).
+
+Processor: Quad-core CPU (Apple M-series or Intel i5+) for real-time AI inference.
+
+Memory: 8GB RAM for smooth state transitions and video processing.
+
+System Configuration
+
+Visual Access: Position the webcam at eye level to accurately track shoulder coordinates.
+
+Lighting: Ensure consistent front-facing lighting for body landmark identification.
+
+Permissions: Grant browser access to the camera via the MediaDevices API
 
 ---
 
