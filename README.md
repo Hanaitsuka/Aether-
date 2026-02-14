@@ -13,7 +13,7 @@
 - Member 2: [Hadiya Thanveer] - [Government Engineering College Thrissur]
 
 ### Hosted Project Link
-[https://drive.google.com/drive/folders/1_aFv-umEnxPWa2G-AZ3sSdF66MGD0AEN]
+[]
 
 ### Project Description
 [Aether is a high-performance productivity dashboard designed to solve the problem of "postural fatigue"—the gradual physical collapse that occurs during intense study sessions. By combining a professional-grade interface with a real-time computer vision engine, Aether automates ergonomic health so the user can remain focused on their output.]
@@ -402,7 +402,7 @@ python script.py -v --format json data.json
 ## Project Demo
 
 ### Video
-[Add your demo video link here - YouTube, Google Drive, etc.]
+[https://drive.google.com/drive/folders/1_aFv-umEnxPWa2G-AZ3sSdF66MGD0AEN]
 
 *Explain what the video demonstrates - key features, user flow, technical highlights*
 
