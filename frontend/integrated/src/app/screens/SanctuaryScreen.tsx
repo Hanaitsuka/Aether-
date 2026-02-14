@@ -8,10 +8,10 @@ import { KnowledgeNexusWidget } from "../components/KnowledgeNexusWidget";
 import { PostureOverlay, PostureCorrectedToast } from "../components/PostureOverlay";
 import { usePostureMonitor } from "../hooks/usePostureMonitor";
 
-import cozyEveningBg from "figma:asset/3219b9e23c240673f05a7a3b5f4196fbbb07efbf.png";
-import beachStudioBg from "figma:asset/9043200908ac0dfb46c82aaea44020cf45a6c178.png";
-import winterStudioBg from "figma:asset/908fc3f6eed6f65df50d0d5230e1034b883b6d42.png";
-import nightStudyBg from "figma:asset/bcab8b830b4aec77c532a2d5ad5e88bf88b9b9b1.png";
+import cozyEveningBg from "../../assets/908fc3f6eed6f65df50d0d5230e1034b883b6d42.png";
+import beachStudioBg from "../../assets/9043200908ac0dfb46c82aaea44020cf45a6c178.png";
+import winterStudioBg from "../../assets/3219b9e23c240673f05a7a3b5f4196fbbb07efbf.png";
+import nightStudyBg from "../../assets/bcab8b830b4aec77c532a2d5ad5e88bf88b9b9b1.png";
 
 type Environment = "cozy-evening" | "beach-studio" | "winter-studio" | "night-study";
 
